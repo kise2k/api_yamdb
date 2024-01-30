@@ -152,3 +152,4 @@ class Comments(models.model):
 
     def __str__(self):
         return self.name[:25]
+
