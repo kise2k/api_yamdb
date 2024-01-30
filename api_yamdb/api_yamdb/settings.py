@@ -1,3 +1,5 @@
+import os
+
 from pathlib import Path
 
 from datetime import timedelta
@@ -26,7 +28,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'reviews.apps.ReviewsConfig',
     'rest_framework',
-    'djoser',
+    'rest_framework_simplejwt'
     'django_filters',
     'users.apps.UsersConfig',
 ]
@@ -63,6 +65,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 
 
+AUTH_USER_MODEL = 'users.User'
+
 # Database
 
 DATABASES = {
@@ -93,7 +97,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
@@ -113,7 +117,7 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 REST_FRAMEWORK = {
 
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny'
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -130,4 +134,5 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-AUTH_USER_MODEL = 'users.User'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR / 'sent_emails')
