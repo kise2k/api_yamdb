@@ -21,18 +21,22 @@ class User(AbstractUser):
         'О себе', null=True
     )
     role = models.SlugField('роль пользователя', choices=ROLES, default=USER)
-    confirmation_code = models.TextField('Код подтверждения', null=True)
 
-    def check_user(self):
+    @property
+    def is_user(self):
         return self.role == USER
 
-    def check_admin(self):
-        return self.role == ADMIN
+    @property
+    def is_admin(self):
+        return self.is_staff or self.role == ADMIN
 
-    def check_moderator(self):
+    def is_moderator(self):
         return self.role == MODERATOR
 
     class Meta:
         ordering = ('username',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.username[:30]
