@@ -1,7 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .constants import ADMIN, MODERATOR, ROLES, USER
+from .constants import (
+    ADMIN, LINE_SLICE_LENGTH,
+    MODERATOR, ROLES, USER
+)
 
 
 class User(AbstractUser):
@@ -28,7 +31,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.role == ADMIN
+        return self.role == ADMIN
 
     def is_moderator(self):
         return self.role == MODERATOR
@@ -39,4 +42,4 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return self.username[:30]
+        return self.username[:LINE_SLICE_LENGTH]
