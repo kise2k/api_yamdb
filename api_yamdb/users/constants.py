@@ -6,3 +6,4 @@ ROLES = [
     (ADMIN, 'администратор'),
     (MODERATOR, 'модератор')
 ]
+LINE_SLICE_LENGTH = 30
