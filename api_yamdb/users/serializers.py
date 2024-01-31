@@ -9,6 +9,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Вы не можете использовать зто Имя пользователя'
+            )
+
 
 class SignUpSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
@@ -27,7 +33,9 @@ class SignUpSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
-    confirmatetion_code = serializers.SlugField(required=True)
+    confirmatetion_code = serializers.CharField(
+        max_length=100, required=True
+    )
 
     class Meta:
         model = User

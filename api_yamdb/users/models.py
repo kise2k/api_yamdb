@@ -21,9 +21,11 @@ class User(AbstractUser):
         'Фамилия', max_length=150, null=True
     )
     bio = models.TextField(
-        'О себе', null=True
+        'О себе', null=True, blank=True
     )
-    role = models.SlugField('роль пользователя', choices=ROLES, default=USER)
+    role = models.CharField(
+        'роль пользователя', max_length=20, choices=ROLES, default=USER
+    )
 
     @property
     def is_user(self):
