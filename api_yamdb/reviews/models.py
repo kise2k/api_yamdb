@@ -7,7 +7,7 @@ from .validators import validate_year
 User = get_user_model()
 
 
-class Categories(models.model):
+class Categories(models.Model):
     """Модель описывающая категории."""
     name = models.CharField(
         max_length=256,
@@ -28,7 +28,7 @@ class Categories(models.model):
         return self.name[:25]
 
 
-class Genres(models.model):
+class Genres(models.Model):
     """Модель описывает Жанры."""
     name = models.CharField(
         max_length=256,
@@ -124,7 +124,7 @@ class Reviews(models.Model):
         return self.text[:25]
 
 
-class Comments(models.model):
+class Comments(models.Model):
     """Модель описывающая комментарии."""
     author = models.ForeignKey(
         User,
@@ -152,4 +152,3 @@ class Comments(models.model):
 
     def __str__(self):
         return self.name[:25]
-
