@@ -58,6 +58,18 @@ class ReviewsSerializers(serializers.ModelSerializer):
         read_only=True, slug_field='username'
     )
 
+    def validation(self, data):
+        title = self.context['view'].kwargs['title_id']
+        if self.context['request'].method == 'POST':
+            if Reviews.objects.filter(
+                author=self.context['request'].user,
+                title=title.exists()
+            ):
+                raise serializers.ValidationError(
+                    'Нельзя оставить комментарий дважды!'
+                )
+            return data
+
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Reviews
