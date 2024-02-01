@@ -6,7 +6,8 @@ from reviews.models import (
     Comments,
     Genres,
     Title,
-    Reviews)
+    Reviews
+)
 
 
 class CategoriesSerializers(serializers.ModelSerializer):
