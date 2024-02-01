@@ -10,13 +10,13 @@ from .serializers import (
     TitleReadSerializers,
     CommentsSerializers,
     ReviewsSerializers)
-from users.permissions import IsAdmin, ReadOnly
+from users.permissions import IsAthorModeraterAdmin
 from reviews.models import Categories, Genres, Title, Comments, Reviews
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comments.objects.all()
     serializer_class = CommentsSerializers
-    permission_classes = (IsAdmin, ReadOnly,)
+    permission_classes = (IsAthorModeraterAdmin,)
     pagination_class = PageNumberPagination
     
     def get_review(self):
@@ -33,7 +33,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReviewsViewSet(viewsets.ModelViewSet):
     queryset = Reviews.objects.all()
     serializer_class = ReviewsSerializers
-    permission_classes = (IsAdmin, ReadOnly,)
+    permission_classes = (IsAthorModeraterAdmin,)
     pagination_class = PageNumberPagination
     
     def get_title(self):
