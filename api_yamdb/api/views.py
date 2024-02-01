@@ -1,11 +1,12 @@
+from rest_framework import filters, viewsets
+from rest_framework.pagination import PageNumberPagination
+
 from .serializers import (
     CategoriesSerializers,
     GenresSerializers,
     TitleSerializers,
     TitleReadSerializers)
-from rest_framework import filters, viewsets
 from reviews.models import Categories, Genres, Title
-from rest_framework.pagination import PageNumberPagination
 
 
 class CategoriesViewSet(viewsets.ModelViewSet):

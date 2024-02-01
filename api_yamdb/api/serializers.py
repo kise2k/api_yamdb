@@ -1,7 +1,12 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Categories, Comments, Genres, Title, Reviews
+from reviews.models import (
+    Categories,
+    Comments,
+    Genres,
+    Title,
+    Reviews)
 
 
 class CategoriesSerializers(serializers.ModelSerializer):
@@ -66,7 +71,7 @@ class ReviewsSerializers(serializers.ModelSerializer):
                 title=title.exists()
             ):
                 raise serializers.ValidationError(
-                    'Нельзя оставить комментарий дважды!'
+                    'Нельзя оставить отзыв дважды!'
                 )
             return data
 
