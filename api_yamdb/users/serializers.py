@@ -18,10 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
     def validate_username(self, username):
-        if username == 'me':
-            raise serializers.ValidationError(
-                'Вы не можете использовать зто Имя пользователя'
-            )
         if not re.match(r'^[\w.@+-]+\Z', username):
             raise serializers.ValidationError(
                 ('Имя пользователя может содержать латиницу, '
@@ -40,10 +36,6 @@ class SignUpSerializer(serializers.ModelSerializer):
         )
 
     def validate_username(self, username):
-        if username == 'me':
-            raise serializers.ValidationError(
-                'Вы не можете использовать зто Имя пользователя'
-            )
         if not re.match(r'^[\w.@+-]+\Z', username):
             raise serializers.ValidationError(
                 ('Имя пользователя может содержать латиницу, '
