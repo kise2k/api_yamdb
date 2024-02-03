@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from django.http import HttpResponseNotAllowed
 
 
 class IsAdmin(permissions.BasePermission):
@@ -14,7 +15,6 @@ class IsAthorModeraterAdmin(permissions.BasePermission):
 
     def has_permission(self, request, view):
         user = request.user
-
         return (
             request.method in permissions.SAFE_METHODS
             or user.is_authenticated
@@ -26,6 +26,14 @@ class IsAthorModeraterAdmin(permissions.BasePermission):
 
 
 class ReadOnly(permissions.BasePermission):
+    
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or (request.user.is_authenticated
+                    and request.user.is_admin))
+
+
+class AnonimReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return request.method in permissions.SAFE_METHODS

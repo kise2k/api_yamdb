@@ -36,7 +36,7 @@ class Genres(models.Model):
     )
     slug = models.SlugField(
         unique=True,
-        max_length=100,
+        max_length=50,
         verbose_name='Уникальный идентификатор жанра'
     )
 
@@ -82,7 +82,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name[:25]
+        return self.name
 
 
 class Reviews(models.Model):
@@ -102,6 +102,8 @@ class Reviews(models.Model):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
+        verbose_name='произведение',
+        
     )
     author = models.ForeignKey(
         User,
@@ -140,7 +142,6 @@ class Comments(models.Model):
     review = models.ForeignKey(
         Reviews,
         on_delete=models.CASCADE,
-        related_name='comments',
         verbose_name='отзыв'
     )
 

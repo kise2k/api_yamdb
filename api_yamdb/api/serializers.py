@@ -44,7 +44,7 @@ class TitleReadSerializers(serializers.ModelSerializer):
 
     class Meta:
         fields = ('id', 'name', 'year', 'rating',
-                  'discription', 'genre', 'category')
+                  'description', 'genres', 'category')
         model = Title
 
 
@@ -52,9 +52,13 @@ class CommentsSerializers(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
+    title = serializers.SlugRelatedField(
+        slug_field='name',
+        read_only=True,
+    )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date', 'title')
         model = Comments
 
 
