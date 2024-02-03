@@ -10,6 +10,7 @@ from rest_framework import (
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+
 from .functions import sending_confirmation_code
 from .models import User
 from .serializers import (
