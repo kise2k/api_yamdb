@@ -6,5 +6,4 @@ ROLES = [
     (ADMIN, 'администратор'),
     (MODERATOR, 'модератор')
 ]
-LINE_SLICE_LENGTH = 30
 TEST_EMAIL = 'user@example.com'

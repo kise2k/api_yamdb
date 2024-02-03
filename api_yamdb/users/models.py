@@ -2,26 +2,28 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from .constants import (
-    ADMIN, LINE_SLICE_LENGTH,
+    ADMIN,
     MODERATOR, ROLES, USER
 )
 
 
 class User(AbstractUser):
     username = models.CharField(
-        'Имя пользователя', max_length=150, unique=True
+        'Имя пользователя',
+        max_length=150,
+        unique=True,
     )
     email = models.EmailField(
         'Почта пользователя', max_length=254, unique=True
     )
     first_name = models.CharField(
-        'Имя', max_length=150, null=True
+        'Имя', max_length=150, blank=True
     )
     last_name = models.CharField(
-        'Фамилия', max_length=150, null=True
+        'Фамилия', max_length=150, blank=True
     )
     bio = models.TextField(
-        'О себе', null=True, blank=True
+        'О себе', blank=True
     )
     role = models.CharField(
         'роль пользователя', max_length=20, choices=ROLES, default=USER
@@ -44,4 +46,4 @@ class User(AbstractUser):
         verbose_name_plural = 'Пользователи'
 
     def __str__(self):
-        return self.username[:LINE_SLICE_LENGTH]
+        return self.username

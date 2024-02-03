@@ -1,3 +1,4 @@
+import re
 from rest_framework import serializers
 
 from .models import User
@@ -7,36 +8,54 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = (
+            'username',
+            'email',
+            'role',
+            'first_name',
+            'last_name',
+            'bio',
+        )
 
-    def validate_username(self, value):
-        if value == 'me':
+    def validate_username(self, username):
+        if username == 'me':
             raise serializers.ValidationError(
                 'Вы не можете использовать зто Имя пользователя'
             )
+        if not re.match(r'^[\w.@+-]+\Z', username):
+            raise serializers.ValidationError(
+                ('Имя пользователя может содержать латиницу, '
+                 'цифры и знаки @ / . / + / - / _')
+            )
+        return username
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'email',)
+        fields = (
+            'username',
+            'email',
+        )
 
-    def validate_username(self, value):
-        if value == 'me':
+    def validate_username(self, username):
+        if username == 'me':
             raise serializers.ValidationError(
                 'Вы не можете использовать зто Имя пользователя'
             )
+        if not re.match(r'^[\w.@+-]+\Z', username):
+            raise serializers.ValidationError(
+                ('Имя пользователя может содержать латиницу, '
+                 'цифры и знаки @ / . / + / - / _')
+            )
+        return username
 
 
 class TokenSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    confirmatetion_code = serializers.CharField(
-        max_length=100, required=True
-    )
+    username = serializers.CharField(max_length=150, required=True)
+    confirmation_code = serializers.CharField(max_length=150, required=True)
 
     class Meta:
         model = User
-        fielda = ('username', 'confirmatetion_code')
+        fields = ('username', 'confirmation_code')
