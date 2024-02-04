@@ -1,17 +1,22 @@
-from rest_framework import filters, viewsets, permissions, mixins
-from rest_framework.pagination import PageNumberPagination
+from rest_framework import filters, viewsets, mixins
 from django.shortcuts import get_object_or_404
-from rest_framework.exceptions import MethodNotAllowed
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .serializers import (
-    CategoriesSerializers,
-    GenresSerializers,
+    CategorySerializers,
+    GenreSerializers,
     TitleSerializers,
     TitleReadSerializers,
     CommentsSerializers,
     ReviewsSerializers)
-from users.permissions import IsAthorModeraterAdmin, ReadOnly, IsAdmin, AnonimReadOnly
-from reviews.models import Categories, Genres, Title, Comments, Reviews
+from users.permissions import (
+    IsAthorModeraterAdmin,
+    ReadOnly,
+    IsAdmin,
+    AnonimReadOnly)
+from reviews.models import Category, Genre, Title, Review
+from .filter import TitleFilter
 
 
 class CategoriesViewSet(
@@ -19,11 +24,10 @@ class CategoriesViewSet(
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
-    ):
-    queryset = Categories.objects.all()
+):
+    queryset = Category.objects.all()
     permission_classes = (ReadOnly | IsAdmin, )
-    serializer_class = CategoriesSerializers
-    pagination_class = PageNumberPagination
+    serializer_class = CategorySerializers
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -34,11 +38,10 @@ class GenresViewSet(
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
-    ):
-    queryset = Genres.objects.all()
-    serializer_class = GenresSerializers
+):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializers
     permission_classes = (ReadOnly | IsAdmin,)
-    pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
@@ -46,51 +49,53 @@ class GenresViewSet(
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
-    pagination_class = PageNumberPagination
-    permission_classes = (AnonimReadOnly | IsAdmin,)
+    permission_classes = (ReadOnly | IsAdmin,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
-        if self.action == ('create', 'update', 'partial_update',):
-            return TitleSerializers
-        return TitleReadSerializers
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializers
+        return TitleSerializers
 
-    def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed("PUT")
+    def get_queryset(self):
+        queryset = Title.objects.annotate(
+            rating=Avg('reviews__score'
+                       )).order_by('id')
+        return queryset
+
 
 class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewsSerializers
-    permission_classes = (IsAthorModeraterAdmin,)
-    pagination_class = PageNumberPagination
-    
+    permission_classes = (
+        AnonimReadOnly,
+        IsAthorModeraterAdmin
+    )
+
     def get_title(self):
         return get_object_or_404(Title, id=self.kwargs.get('title_id'))
-    
+
     def get_queryset(self):
-        return self.get_title().reviews.all()
+        return self.get_title().reviews.all().order_by('id')
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, title=self.get_title())
-    
-    def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed("PUT")
+        title = self.get_title()
+        serializer.is_valid(raise_exception=True)
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentsSerializers
     permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly,
+        AnonimReadOnly,
         IsAthorModeraterAdmin
     )
-    pagination_class = PageNumberPagination
-    
+
     def get_review(self):
-        return get_object_or_404(Reviews, id=self.kwargs.get('review_id'))
-    
+        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
+
     def get_queryset(self):
         return self.get_review().comment.all()
-    
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user, review=self.get_review())
-
-    def update(self, request, *args, **kwargs):
-        raise MethodNotAllowed("PUT")

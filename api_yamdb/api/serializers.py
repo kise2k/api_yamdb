@@ -2,50 +2,63 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
 from reviews.models import (
-    Categories,
+    Category,
     Comments,
-    Genres,
+    Genre,
     Title,
-    Reviews)
+    Review)
 
 
-class CategoriesSerializers(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ('name', 'slug')
-        model = Categories
-
-
-class GenresSerializers(serializers.ModelSerializer):
+class CategorySerializers(serializers.ModelSerializer):
 
     class Meta:
         fields = ('name', 'slug')
-        model = Genres
+        model = Category
 
 
-class TitleSerializers(serializers.ModelSerializer):
-    categories = SlugRelatedField(
-        slug_field='slug',
-        queryset=Categories.objects.all())
-    genres = SlugRelatedField(
-        slug_field='slug',
-        queryset=Genres.objects.all(),
-        many=True)
+class GenreSerializers(serializers.ModelSerializer):
 
     class Meta:
-        fields = '__all__'
-        model = Title
+        fields = ('name', 'slug')
+        model = Genre
 
 
 class TitleReadSerializers(serializers.ModelSerializer):
-    category = CategoriesSerializers(read_only=True)
-    genres = GenresSerializers(read_only=True, many=True)
+    category = CategorySerializers(read_only=True)
+    genre = GenreSerializers(read_only=True, many=True)
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating',
-                  'description', 'genres', 'category')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category'
+        )
         model = Title
+
+
+class TitleSerializers(serializers.ModelSerializer):
+    category = SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all())
+    genre = SlugRelatedField(
+        slug_field='slug',
+        queryset=Genre.objects.all(),
+        many=True)
+
+    class Meta:
+        fields = (
+            'name', 'year', 'description', 'genre', 'category'
+        )
+        model = Title
+
+    def to_representation(self, title):
+        serializer = TitleReadSerializers(title)
+        return serializer.data
 
 
 class CommentsSerializers(serializers.ModelSerializer):
@@ -63,22 +76,22 @@ class CommentsSerializers(serializers.ModelSerializer):
 
 
 class ReviewsSerializers(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        read_only=True, slug_field='username'
+    author = serializers.StringRelatedField(
+        read_only=True
     )
 
-    def validation(self, data):
-        title = self.context['view'].kwargs['title_id']
-        if self.context['request'].method == 'POST':
-            if Reviews.objects.filter(
-                author=self.context['request'].user,
-                title=title.exists()
-            ):
-                raise serializers.ValidationError(
-                    'Нельзя оставить отзыв дважды!'
-                )
+    def validate(self, data):
+        """Запрещает пользователям оставлять повторные отзывы."""
+        if not self.context.get('request').method == 'POST':
             return data
+        author = self.context.get('request').user
+        title_id = self.context.get('view').kwargs.get('title_id')
+        if Review.objects.filter(author=author, title=title_id).exists():
+            raise serializers.ValidationError(
+                'Вы уже оставляли отзыв на это произведение'
+            )
+        return data
 
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-        model = Reviews
+        model = Review
