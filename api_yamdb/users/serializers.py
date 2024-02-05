@@ -24,8 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             )
         if not re.match(r'^[\w.@+-]+\Z', username):
             raise serializers.ValidationError(
-                ('Имя пользователя может содержать латиницу, '
-                 'цифры и знаки @ / . / + / - / _')
+                ('Недопустимое имя пользователя')
             )
         return username
 
@@ -46,8 +45,7 @@ class SignUpSerializer(serializers.ModelSerializer):
             )
         if not re.match(r'^[\w.@+-]+\Z', username):
             raise serializers.ValidationError(
-                ('Имя пользователя может содержать латиницу, '
-                 'цифры и знаки @ / . / + / - / _')
+                ('Недопустимое имя пользователя')
             )
         return username
 
