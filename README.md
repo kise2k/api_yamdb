@@ -16,14 +16,17 @@ cd api_yambd/
 Создавть и активировать виртуальное окружение:
 python -m venv venv
 source venv/scripts/activate
+
 Установить зависимости из файла requirements.txt:
 
 python -m pip install --upgrade pip
 pip install -r requirements.txt
+
 Выполнить миграции:
 
 cd api_yambd
 python manage.py migrate
+
 Запустить проект:
 
 python manage.py runserver
