@@ -81,7 +81,6 @@ class ReviewsSerializers(serializers.ModelSerializer):
     )
 
     def validate(self, data):
-        """Запрещает пользователям оставлять повторные отзывы."""
         if not self.context.get('request').method == 'POST':
             return data
         author = self.context.get('request').user

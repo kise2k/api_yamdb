@@ -7,6 +7,13 @@ from django.core.validators import (
 )
 
 from .validators import validate_year
+from .constants import (
+    LENGTH_FOR_ADMIN,
+    NAME_CONST_CHAR,
+    SLUG_CONST_CHAR,
+    MIN_CONST_SCORE_VALUE,
+    MAX_CONST_SCORE_VALUE
+)
 
 User = get_user_model()
 
@@ -14,13 +21,13 @@ User = get_user_model()
 class Category(models.Model):
     """Модель описывающая категории."""
     name = models.CharField(
-        max_length=256,
+        max_length=NAME_CONST_CHAR,
         verbose_name='Имя категории',
         db_index=True
     )
     slug = models.SlugField(
         unique=True,
-        max_length=50,
+        max_length=SLUG_CONST_CHAR,
         verbose_name='Уникальный идентификатор категории',
         validators=[RegexValidator(
             regex=r'^[-a-zA-Z0-9_]+$',
@@ -34,18 +41,18 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name[:25]
+        return self.name[:LENGTH_FOR_ADMIN]
 
 
 class Genre(models.Model):
     """Модель описывает Жанры."""
     name = models.CharField(
-        max_length=256,
+        max_length=NAME_CONST_CHAR,
         verbose_name='Имя жанра'
     )
     slug = models.SlugField(
         unique=True,
-        max_length=50,
+        max_length=SLUG_CONST_CHAR,
         verbose_name='Уникальный идентификатор жанра',
         validators=[RegexValidator(
             regex=r'^[-a-zA-Z0-9_]+$',
@@ -59,13 +66,13 @@ class Genre(models.Model):
         verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name[:25]
+        return self.name[:LENGTH_FOR_ADMIN]
 
 
 class Title(models.Model):
     """Модель описывающая произведения, к которым пишут отзывы"""
     name = models.CharField(
-        max_length=256,
+        max_length=NAME_CONST_CHAR,
         verbose_name='Имя произведения'
     )
     year = models.IntegerField(
@@ -95,7 +102,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name
+        return self.name[:LENGTH_FOR_ADMIN]
 
 
 class Review(models.Model):
@@ -104,7 +111,10 @@ class Review(models.Model):
         verbose_name='Текст отзыва'
     )
     score = models.IntegerField(
-        validators=[MaxValueValidator(10), MinValueValidator(1)],
+        validators=[
+            MaxValueValidator(MAX_CONST_SCORE_VALUE),
+            MinValueValidator(MIN_CONST_SCORE_VALUE)
+        ],
         verbose_name='Оценка(1-10)',
     )
     pub_date = models.DateTimeField(
@@ -136,7 +146,7 @@ class Review(models.Model):
         )
 
     def __str__(self):
-        return self.text[:25]
+        return self.text[:LENGTH_FOR_ADMIN]
 
 
 class Comments(models.Model):
@@ -167,4 +177,4 @@ class Comments(models.Model):
         ordering = ('pub_date', )
 
     def __str__(self):
-        return self.name[:25]
+        return self.text[:LENGTH_FOR_ADMIN]
