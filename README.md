@@ -8,12 +8,15 @@ JWT-tokens
 
 Как запустить проект:
 Клонировать репозиторий:
+
 git clone https://github.com/kise2k/api_yambd.git
 
 перейти в него в командной строке:
+
 cd api_yambd/
 
 Создавть и активировать виртуальное окружение:
+
 python -m venv venv
 source venv/scripts/activate
 
