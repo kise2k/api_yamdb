@@ -8,7 +8,7 @@ from .views import (
     TitleViewSet,
     ReviewsViewSet
 )
-from users.views import UserViewSet, TokenViewSet, SignUpViewSet
+from users.views import UserViewSet, TokenView, SignUpView
 
 router_ver_1 = DefaultRouter()
 
@@ -31,12 +31,12 @@ router_ver_1.register(r'users', UserViewSet, basename='user')
 auth_urls = [
     path(
         'signup/',
-        SignUpViewSet.as_view({'post': 'create'}),
+        SignUpView.as_view(),
         name='signup'
     ),
     path(
         'token/',
-        TokenViewSet.as_view({'post': 'create'}),
+        TokenView.as_view(),
         name='token'
     )
 ]
