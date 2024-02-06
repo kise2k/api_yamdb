@@ -10,13 +10,16 @@ from .serializers import (
     TitleReadSerializers,
     CommentsSerializers,
     ReviewsSerializers)
-from users.permissions import (
+
+from .permission import (
     IsAthorModeraterAdmin,
     ReadOnly,
     IsAdmin,
-    AnonimReadOnly)
-from reviews.models import Category, Genre, Title, Review
+    AnonimReadOnly
+)
 from .filter import TitleFilter
+
+from reviews.models import Category, Genre, Title, Review
 
 
 class CategoriesViewSet(
@@ -26,7 +29,7 @@ class CategoriesViewSet(
     viewsets.GenericViewSet
 ):
     queryset = Category.objects.all()
-    permission_classes = (ReadOnly | IsAdmin, )
+    permission_classes = (IsAdmin | ReadOnly,)
     serializer_class = CategorySerializers
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -52,6 +55,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (ReadOnly | IsAdmin,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
@@ -71,6 +75,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         AnonimReadOnly,
         IsAthorModeraterAdmin
     )
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_title(self):
         return get_object_or_404(Title, id=self.kwargs.get('title_id'))
@@ -90,6 +95,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         AnonimReadOnly,
         IsAthorModeraterAdmin
     )
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_review(self):
         return get_object_or_404(Review, id=self.kwargs.get('review_id'))
