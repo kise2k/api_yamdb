@@ -25,9 +25,13 @@ class GenresAdmin(admin.ModelAdmin):
 class TitleAdmin(admin.ModelAdmin):
     """Настройка админ панели для произведений."""
     list_filter = ('name', 'category')
-    list_display = ('name', 'year', 'description', 'category')
+    list_display = ('name', 'year', 'description', 'category', 'get_genres')
     search_fields = ('name', 'description')
     empty_value_display = 'пусто'
+
+    def get_genres(self, obj):
+        return ", ".join([genre.name for genre in obj.genres.all()])
+    get_genres.short_description = 'Genres'
 
 
 @admin.register(Review)
