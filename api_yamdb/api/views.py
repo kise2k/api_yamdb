@@ -22,36 +22,32 @@ from .filter import TitleFilter
 from reviews.models import Category, Genre, Title, Review
 
 
-class CategoriesViewSet(
+class CategoryGenreViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
-    queryset = Category.objects.all()
-    permission_classes = (IsAdmin | ReadOnly,)
-    serializer_class = CategorySerializers
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
-
-
-class GenresViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    queryset = Genre.objects.all()
-    serializer_class = GenreSerializers
     permission_classes = (ReadOnly | IsAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
 
 
+class CategoriesViewSet(CategoryGenreViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializers
+
+
+class GenresViewSet(CategoryGenreViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializers
+
+
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score'
+                   )).order_by('name', 'year')
     permission_classes = (ReadOnly | IsAdmin,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -61,12 +57,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('list', 'retrieve'):
             return TitleReadSerializers
         return TitleSerializers
-
-    def get_queryset(self):
-        queryset = Title.objects.annotate(
-            rating=Avg('reviews__score'
-                       )).order_by('id')
-        return queryset
 
 
 class ReviewsViewSet(viewsets.ModelViewSet):
@@ -81,12 +71,12 @@ class ReviewsViewSet(viewsets.ModelViewSet):
         return get_object_or_404(Title, id=self.kwargs.get('title_id'))
 
     def get_queryset(self):
-        return self.get_title().reviews.all().order_by('id')
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title = self.get_title()
-        serializer.is_valid(raise_exception=True)
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user,
+                        title=self.get_title()
+                        )
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -98,7 +88,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_review(self):
-        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        return get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id', 'title_id')
+        )
 
     def get_queryset(self):
         return self.get_review().comment.all()
