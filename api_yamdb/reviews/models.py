@@ -37,12 +37,14 @@ class CategoryAndGenre(models.Model):
     def __str__(self):
         return self.name[:LENGTH_FOR_ADMIN]
 
+
 class Category(CategoryAndGenre):
     """Модель описывающая категории."""
 
     class Meta(CategoryAndGenre.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
+
 
 class Genre(CategoryAndGenre):
     """Модель описывающая жанры."""
@@ -117,12 +119,19 @@ class ReviewAndCommentsBase(models.Model):
     def __str__(self):
         return self.text[:LENGTH_FOR_ADMIN]
 
+
 class Review(ReviewAndCommentsBase):
     """Модель описывающая отзывы."""
     score = models.PositiveSmallIntegerField(
         validators=[
-            MaxValueValidator(MAX_CONST_SCORE_VALUE, message='Введенная оценка выше допустимой'),
-            MinValueValidator(MIN_CONST_SCORE_VALUE, message='Введенная оценка ниже допустимой')
+            MaxValueValidator(
+                MAX_CONST_SCORE_VALUE,
+                message='Введенная оценка выше допустимой'
+            ),
+            MinValueValidator(
+                MIN_CONST_SCORE_VALUE,
+                message='Введенная оценка ниже допустимой'
+            )
         ],
         verbose_name='Оценка(1-10)',
     )
@@ -142,6 +151,7 @@ class Review(ReviewAndCommentsBase):
             ),
         )
         default_related_name = 'reviews'
+
 
 class Comments(ReviewAndCommentsBase):
     """Модель описывающая комментарии."""
