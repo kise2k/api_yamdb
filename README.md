@@ -33,6 +33,10 @@ cd api_yambd
 
 python manage.py migrate
 
+Импорт данных из csv файлов в БД:
+
+python manage.py import_data
+
 Запустить проект:
 
 python manage.py runserver
