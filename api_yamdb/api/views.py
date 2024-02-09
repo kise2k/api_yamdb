@@ -1,4 +1,4 @@
-from rest_framework import filters, viewsets, mixins
+from rest_framework import filters, viewsets, mixins, permissions
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,7 +15,6 @@ from .permission import (
     IsAthorModeraterAdmin,
     ReadOnly,
     IsAdmin,
-    AnonimReadOnly
 )
 from .filter import TitleFilter
 
@@ -62,7 +61,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewsSerializers
     permission_classes = (
-        AnonimReadOnly,
+        permissions.IsAuthenticatedOrReadOnly,
         IsAthorModeraterAdmin
     )
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -82,7 +81,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentsSerializers
     permission_classes = (
-        AnonimReadOnly,
+        permissions.IsAuthenticatedOrReadOnly,
         IsAthorModeraterAdmin
     )
     http_method_names = ['get', 'post', 'patch', 'delete']

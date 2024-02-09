@@ -29,9 +29,9 @@ class TitleAdmin(admin.ModelAdmin):
     search_fields = ('name', 'description')
     empty_value_display = 'пусто'
 
+    @admin.display(description='Genres')
     def get_genres(self, obj):
-        return ", ".join([genre.name for genre in obj.genres.all()])
-    get_genres.short_description = 'Genres'
+        return ', '.join([genre.name for genre in obj.genres.all()])
 
 
 @admin.register(Review)
