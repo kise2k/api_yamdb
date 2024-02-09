@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .functions import UserValidateMixin
 from .models import User
 
 

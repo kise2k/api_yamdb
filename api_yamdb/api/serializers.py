@@ -151,11 +151,8 @@ class TokenSerializer(serializers.Serializer, UserValidateMixin):
     )
 
     def validate(self, data):
-        username = data.get('username')
-        if not username:
-            raise serializers.ValidationError('Требуется имя пользователя.')
         confirmation_code = data.get('confirmation_code')
-        user = get_object_or_404(User, username=username)
+        user = get_object_or_404(User, username=data.get('username'))
         if not default_token_generator.check_token(user, confirmation_code):
             raise serializers.ValidationError('Код подтверждения невалиден')
         token = {'token': str(AccessToken.for_user(user))}
