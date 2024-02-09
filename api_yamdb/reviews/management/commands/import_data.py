@@ -14,7 +14,7 @@ from reviews.models import (
 )
 from users.models import User
 
-csv_files = {
+CSV_FILES = {
     'users.csv': User,
     'category.csv': Category,
     'genre.csv': Genre,
@@ -29,55 +29,11 @@ class Command(BaseCommand):
     help = 'Импорт данных из csv файлов в БД'
 
     def handle(self, *args: Any, **options: Any) -> str | None:
-        for file, model in csv_files.items():
+        for file, model in CSV_FILES.items():
             try:
-                for row in csv.DictReader(open(f'./static/data/{file}')):
-                    if file == 'users.csv':
-                        model.objects.create(
-                            id=row['id'],
-                            username=row['username'],
-                            email=row['email'],
-                            role=row['role'],
-                            bio=row['bio'],
-                            first_name=row['first_name'],
-                            last_name=row['last_name'],
-                        )
-                    elif file == 'genre.csv' or file == 'category.csv':
-                        model.objects.create(
-                            id=row['id'],
-                            name=row['name'],
-                            slug=row['slug'],
-                        )
-                    elif file == 'titles.csv':
-                        model.objects.create(
-                            id=row['id'],
-                            name=row['name'],
-                            year=row['year'],
-                            category=Category.objects.get(id=row['category']),
-                        )
-                    elif file == 'genre_title.csv':
-                        model.objects.create(
-                            id=row['id'],
-                            title_id=row['title_id'],
-                            genre_id=row['genre_id'],
-                        )
-                    elif file == 'review.csv':
-                        model.objects.create(
-                            id=row['id'],
-                            title_id=row['title_id'],
-                            text=row['text'],
-                            author=User.objects.get(id=row['author'],),
-                            score=row['score'],
-                            pub_date=row['pub_date'],
-                        )
-                    elif file == 'comments.csv':
-                        model.objects.create(
-                            id=row['id'],
-                            review_id=row['review_id'],
-                            text=row['text'],
-                            author=User.objects.get(id=row['author'],),
-                            pub_date=row['pub_date'],
-                        )
+                with open(f'./static/data/{file}') as csv_file:
+                    reader = csv.DictReader(csv_file)
+                    model.objects.bulk_create(model(**dict) for dict in reader)
                 self.stderr.write(f'Данные из файла {file} успешно загружены')
 
             except FileNotFoundError:
