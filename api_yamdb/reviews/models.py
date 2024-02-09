@@ -10,10 +10,9 @@ from .constants import (
     SLUG_CONST_CHAR,
     MIN_CONST_SCORE_VALUE,
     MAX_CONST_SCORE_VALUE,
-    MIN_COSNT_FOR_YEAR,
-    NOW_YEAR,
 )
 from users.models import User
+from .validators import validate_year
 
 
 class NameAndSlugBaseModel(models.Model):
@@ -60,17 +59,8 @@ class Title(models.Model):
         verbose_name='Имя произведения'
     )
     year = models.SmallIntegerField(
-        validators=[
-            MinValueValidator(
-                MIN_COSNT_FOR_YEAR,
-                message='Значение года не может быть отрицательным'
-            ),
-            MaxValueValidator(
-                NOW_YEAR,
-                message='Значение года не может быть больше текущего'
-            )
-        ],
-        verbose_name='Год создания',
+            validators=(validate_year,),
+            verbose_name='Год создания',
     )
     description = models.TextField(
         null=True,
