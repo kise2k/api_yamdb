@@ -6,14 +6,15 @@ from reviews.constants import (
     FIELD_LEN_254,
     USER, ADMIN, MODERATOR, ROLES
 )
-from .functions import UserValidateMixin
+from .functions import validate_username
 
 
-class User(AbstractUser, UserValidateMixin):
+class User(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=FIELD_LEN_150,
         unique=True,
+        validators=[validate_username]
     )
     email = models.EmailField(
         verbose_name='Почта пользователя',
@@ -36,7 +37,7 @@ class User(AbstractUser, UserValidateMixin):
     )
     role = models.CharField(
         verbose_name='роль пользователя',
-        max_length=max([len(value[1]) for value in ROLES]),
+        max_length=max([len(value) for value, _ in ROLES]),
         choices=ROLES,
         default=USER
     )

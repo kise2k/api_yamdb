@@ -6,7 +6,7 @@ from .models import User
 
 
 @admin.register(User)
-class UserAdmin(UserAdmin, UserValidateMixin):
+class UserAdmin(UserAdmin):
     list_display = (
         'username',
         'email',

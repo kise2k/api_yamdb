@@ -1,4 +1,5 @@
 import re
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
@@ -16,16 +17,20 @@ def sending_confirmation_code(user):
     )
 
 
-class UserValidateMixin:
+def validate_username(value):
     regex = re.compile(r'^[\w.@+-]+\Z')
+    if value.lower() == 'me':
+        raise ValidationError(
+            'Недопустимое имя пользователя'
+        )
+    if not regex.findall(value):
+        raise ValidationError(
+            ('Недопустимое имя пользователя')
+        )
+    return value
 
-    def validate_username(self, value):
-        if value.lower() == 'me':
-            raise ValidationError(
-                'Недопустимое имя пользователя'
-            )
-        if not self.regex.findall(value):
-            raise ValidationError(
-                ('Недопустимое имя пользователя')
-            )
-        return value
+
+class UserValidateMixin:
+    @staticmethod
+    def validate_username(value):
+        return validate_username(value)
