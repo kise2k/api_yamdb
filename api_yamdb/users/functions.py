@@ -18,14 +18,14 @@ def sending_confirmation_code(user):
 
 
 def validate_username(value):
-    regex = re.compile(r'^[\w.@+-]+\Z')
+    regex = re.compile(settings.REGEX_PATTERN)
     if value.lower() == 'me':
         raise ValidationError(
-            'Недопустимое имя пользователя'
+            'Имя пользователя me запрещено'
         )
     if not regex.findall(value):
         raise ValidationError(
-            ('Недопустимое имя пользователя')
+            (f'Разрешены символы: {settings.REGEX_ALLOWS}')
         )
     return value
 

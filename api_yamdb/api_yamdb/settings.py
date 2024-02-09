@@ -131,3 +131,6 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR / 'sent_emails')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DEFAULT_FROM_EMAIL = 'your_custom_email@example.com'
+
+REGEX_PATTERN = r'^[\w.@+-]+\Z'
+REGEX_ALLOWS = 'a-z/A-Z/0-9/. /@ /+/- '

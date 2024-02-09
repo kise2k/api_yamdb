@@ -138,7 +138,7 @@ class SignUpSerializer(serializers.Serializer, UserValidateMixin):
         fields = ('username', 'email')
 
 
-class TokenSerializer(serializers.Serializer):
+class TokenSerializer(serializers.Serializer, UserValidateMixin):
 
     username = serializers.CharField(
         max_length=FIELD_LEN_150,
