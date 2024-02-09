@@ -80,6 +80,7 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
+        through='Title_Genre',
         verbose_name='Жанр',
     )
     category = models.ForeignKey(
@@ -96,6 +97,22 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name[:LENGTH_FOR_ADMIN]
+
+
+class Title_Genre(models.Model):
+    """Вспомогательный класс для модели Title"""
+
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{self.genre} {self.title}"[:LENGTH_FOR_ADMIN]
 
 
 class ReviewAndCommentsBase(models.Model):
