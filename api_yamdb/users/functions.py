@@ -1,8 +1,11 @@
 import re
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
+
+from reviews.constants import REGEX_ALLOWS, REGEX_PATTERN
 
 
 def sending_confirmation_code(user):
@@ -16,16 +19,20 @@ def sending_confirmation_code(user):
     )
 
 
-class UserValidateMixin:
-    regex = re.compile(r'^[\w.@+-]+\Z')
+def validate_username(value):
+    regex = re.compile(REGEX_PATTERN)
+    if value.lower() == 'me':
+        raise ValidationError(
+            'Имя пользователя me запрещено'
+        )
+    if not regex.findall(value):
+        raise ValidationError(
+            (f'Разрешены символы: {REGEX_ALLOWS}')
+        )
+    return value
 
-    def validate_username(self, value):
-        if value.lower() == 'me':
-            raise ValidationError(
-                'Недопустимое имя пользователя'
-            )
-        if not self.regex.findall(value):
-            raise ValidationError(
-                ('Недопустимое имя пользователя')
-            )
-        return value
+
+class UserValidateMixin:
+    @staticmethod
+    def validate_username(value):
+        return validate_username(value)

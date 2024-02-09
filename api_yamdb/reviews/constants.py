@@ -17,3 +17,6 @@ ROLES = (
     (ADMIN, 'Администратор'),
     (MODERATOR, 'Модератор')
 )
+
+REGEX_PATTERN = r'^[\w.@+-]+\Z'
+REGEX_ALLOWS = 'a-z/A-Z/0-9/. /@ /+/- '
