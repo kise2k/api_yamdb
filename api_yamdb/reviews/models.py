@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.db import models
 from django.core.validators import (
     MinValueValidator,
@@ -13,11 +11,12 @@ from .constants import (
     MIN_CONST_SCORE_VALUE,
     MAX_CONST_SCORE_VALUE,
     MIN_COSNT_FOR_YEAR,
+    NOW_YEAR,
 )
 from users.models import User
 
 
-class CategoryAndGenre(models.Model):
+class NameAndSlugBaseModel(models.Model):
     """Абстрактная модель, описывающая категории и жанры."""
     name = models.CharField(
         max_length=NAME_CONST_CHAR,
@@ -38,18 +37,18 @@ class CategoryAndGenre(models.Model):
         return self.name[:LENGTH_FOR_ADMIN]
 
 
-class Category(CategoryAndGenre):
+class Category(NameAndSlugBaseModel):
     """Модель описывающая категории."""
 
-    class Meta(CategoryAndGenre.Meta):
+    class Meta(NameAndSlugBaseModel.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
 
-class Genre(CategoryAndGenre):
+class Genre(NameAndSlugBaseModel):
     """Модель описывающая жанры."""
 
-    class Meta(CategoryAndGenre.Meta):
+    class Meta(NameAndSlugBaseModel.Meta):
         verbose_name = 'жанр'
         verbose_name_plural = 'Жанры'
 
@@ -60,14 +59,14 @@ class Title(models.Model):
         max_length=NAME_CONST_CHAR,
         verbose_name='Имя произведения'
     )
-    year = models.PositiveSmallIntegerField(
+    year = models.SmallIntegerField(
         validators=[
             MinValueValidator(
                 MIN_COSNT_FOR_YEAR,
                 message='Значение года не может быть отрицательным'
             ),
             MaxValueValidator(
-                int(datetime.now().year),
+                NOW_YEAR,
                 message='Значение года не может быть больше текущего'
             )
         ],
@@ -98,7 +97,7 @@ class Title(models.Model):
         return self.name[:LENGTH_FOR_ADMIN]
 
 
-class ReviewAndCommentsBase(models.Model):
+class AuthorTextPubDateBaseModel(models.Model):
     """Абстрактный базовый класс для моделей Review и Comment."""
     author = models.ForeignKey(
         User,
@@ -120,17 +119,17 @@ class ReviewAndCommentsBase(models.Model):
         return self.text[:LENGTH_FOR_ADMIN]
 
 
-class Review(ReviewAndCommentsBase):
+class Review(AuthorTextPubDateBaseModel):
     """Модель описывающая отзывы."""
     score = models.PositiveSmallIntegerField(
         validators=[
             MaxValueValidator(
                 MAX_CONST_SCORE_VALUE,
-                message='Введенная оценка выше допустимой'
+                message='Введенная оценка больше 10, введите оценку (0-10)'
             ),
             MinValueValidator(
                 MIN_CONST_SCORE_VALUE,
-                message='Введенная оценка ниже допустимой'
+                message='Введенная оценка меньше 0, введите оценку (0-10)'
             )
         ],
         verbose_name='Оценка(1-10)',
@@ -141,7 +140,7 @@ class Review(ReviewAndCommentsBase):
         verbose_name='Произведение',
     )
 
-    class Meta(ReviewAndCommentsBase.Meta):
+    class Meta(AuthorTextPubDateBaseModel.Meta):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = (
@@ -153,7 +152,7 @@ class Review(ReviewAndCommentsBase):
         default_related_name = 'reviews'
 
 
-class Comments(ReviewAndCommentsBase):
+class Comments(AuthorTextPubDateBaseModel):
     """Модель описывающая комментарии."""
     review = models.ForeignKey(
         Review,
@@ -161,7 +160,7 @@ class Comments(ReviewAndCommentsBase):
         verbose_name='Отзыв',
     )
 
-    class Meta(ReviewAndCommentsBase.Meta):
+    class Meta(AuthorTextPubDateBaseModel.Meta):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         default_related_name = 'comment'

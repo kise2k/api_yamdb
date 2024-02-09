@@ -5,6 +5,7 @@ from rest_framework import (
     filters,
     viewsets,
     mixins,
+    permissions
 )
 
 
@@ -21,7 +22,6 @@ from .permission import (
     IsAthorModeraterAdmin,
     ReadOnly,
     IsAdmin,
-    AnonimReadOnly
 )
 from .filter import TitleFilter
 from reviews.models import Category, Genre, Title, Review
@@ -67,7 +67,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewsViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewsSerializers
     permission_classes = (
-        AnonimReadOnly,
+        permissions.IsAuthenticatedOrReadOnly,
         IsAthorModeraterAdmin
     )
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -87,7 +87,7 @@ class ReviewsViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentsSerializers
     permission_classes = (
-        AnonimReadOnly,
+        permissions.IsAuthenticatedOrReadOnly,
         IsAthorModeraterAdmin
     )
     http_method_names = ['get', 'post', 'patch', 'delete']

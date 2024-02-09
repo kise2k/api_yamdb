@@ -1,3 +1,6 @@
+from django.utils import timezone
+
+NOW_YEAR = timezone.now().year
 NAME_CONST_CHAR = 256
 SLUG_CONST_CHAR = 50
 LENGTH_FOR_ADMIN = 25
@@ -6,7 +9,6 @@ MAX_CONST_SCORE_VALUE = 10
 FIELD_LEN_150 = 150
 FIELD_LEN_254 = 254
 MIN_COSNT_FOR_YEAR = 0
-
 USER = 'user'
 ADMIN = 'admin'
 MODERATOR = 'moderator'
