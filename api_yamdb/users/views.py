@@ -1,22 +1,23 @@
-from django.shortcuts import get_object_or_404
-from rest_framework.views import APIView
 from rest_framework import (
     filters,
-    permissions,
     viewsets,
-    status,
+    permissions,
 )
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken
 
-from api.permission import IsAdmin
-from .models import User
-from .serializers import (
+
+from api.serializers import (
     SignUpSerializer,
     UserSerializer,
     TokenSerializer
 )
+
+from api.permission import (
+    IsAdmin,
+)
+from .models import User
 
 
 class SignUpView(APIView):
@@ -27,7 +28,7 @@ class SignUpView(APIView):
         serializer = SignUpSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        return Response(serializer.validated_data)
 
 
 class TokenView(APIView):
@@ -37,11 +38,7 @@ class TokenView(APIView):
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data.get('username')
-        user = get_object_or_404(User, username=username)
-        token = AccessToken.for_user(user)
-        return Response({'token': str(token)},
-                        status=status.HTTP_200_OK)
+        return Response(serializer.validated_data)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -50,7 +47,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
-    http_method_names = ['get', 'post', 'patch', 'delete']
+    http_method_names = ('get', 'post', 'patch', 'delete')
     lookup_field = 'username'
 
     @action(
@@ -59,8 +56,7 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def get_me_data(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(UserSerializer(request.user).data)
 
     @get_me_data.mapping.patch
     def update_me_data(self, request):
@@ -70,4 +66,4 @@ class UserViewSet(viewsets.ModelViewSet):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save(role=request.user.role)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data)

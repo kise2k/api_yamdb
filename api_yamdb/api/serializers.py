@@ -1,3 +1,7 @@
+from django.contrib.auth.tokens import default_token_generator
+from django.shortcuts import get_object_or_404
+from django.db import IntegrityError
+from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
@@ -7,6 +11,9 @@ from reviews.models import (
     Genre,
     Title,
     Review)
+from reviews.constants import FIELD_LEN_150, FIELD_LEN_254
+from users.functions import UserValidateMixin, sending_confirmation_code
+from users.models import User
 
 
 class CategorySerializers(serializers.ModelSerializer):
@@ -91,3 +98,62 @@ class ReviewsSerializers(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'role',
+            'first_name',
+            'last_name',
+            'bio',
+        )
+
+
+class SignUpSerializer(serializers.Serializer, UserValidateMixin):
+
+    username = serializers.CharField(
+        max_length=FIELD_LEN_150,
+        required=True
+    )
+    email = serializers.EmailField(
+        max_length=FIELD_LEN_254,
+        required=True
+    )
+
+    def create(self, validated_data):
+        try:
+            user, _ = User.objects.get_or_create(**validated_data)
+        except IntegrityError as e:
+            raise serializers.ValidationError({'detail': str(e)})
+        sending_confirmation_code(user)
+        return user
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+
+class TokenSerializer(serializers.Serializer, UserValidateMixin):
+
+    username = serializers.CharField(
+        max_length=FIELD_LEN_150,
+        required=True,
+    )
+
+    confirmation_code = serializers.CharField(
+        max_length=FIELD_LEN_150,
+        required=True,
+    )
+
+    def validate(self, data):
+        confirmation_code = data.get('confirmation_code')
+        user = get_object_or_404(User, username=data.get('username'))
+        if not default_token_generator.check_token(user, confirmation_code):
+            raise serializers.ValidationError('Код подтверждения невалиден')
+        token = {'token': str(AccessToken.for_user(user))}
+        return token
