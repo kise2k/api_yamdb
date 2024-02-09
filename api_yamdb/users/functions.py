@@ -5,6 +5,8 @@ from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 
+from reviews.constants import REGEX_ALLOWS, REGEX_PATTERN
+
 
 def sending_confirmation_code(user):
     confirmation_code = default_token_generator.make_token(user)
@@ -18,14 +20,14 @@ def sending_confirmation_code(user):
 
 
 def validate_username(value):
-    regex = re.compile(settings.REGEX_PATTERN)
+    regex = re.compile(REGEX_PATTERN)
     if value.lower() == 'me':
         raise ValidationError(
             'Имя пользователя me запрещено'
         )
     if not regex.findall(value):
         raise ValidationError(
-            (f'Разрешены символы: {settings.REGEX_ALLOWS}')
+            (f'Разрешены символы: {REGEX_ALLOWS}')
         )
     return value
 
