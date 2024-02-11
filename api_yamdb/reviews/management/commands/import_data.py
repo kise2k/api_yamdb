@@ -31,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any) -> str | None:
         for file, model in CSV_FILES.items():
             try:
-                with open(f'./static/data/{file}') as csv_file:
+                with open(f'./static/data/{file}', encoding='utf-8') as csv_file:
                     reader = csv.DictReader(csv_file)
                     model.objects.bulk_create(model(**dict) for dict in reader)
                 self.stderr.write(f'Данные из файла {file} успешно загружены')

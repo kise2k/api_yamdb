@@ -15,7 +15,7 @@ from users.models import User
 from .validators import validate_year
 
 
-class NameAndSlugBaseModel(models.Model):
+class NameAndSlug(models.Model):
     """Абстрактная модель, описывающая категории и жанры."""
     name = models.CharField(
         max_length=NAME_CONST_CHAR,
@@ -36,18 +36,18 @@ class NameAndSlugBaseModel(models.Model):
         return self.name[:LENGTH_FOR_ADMIN]
 
 
-class Category(NameAndSlugBaseModel):
+class Category(NameAndSlug):
     """Модель описывающая категории."""
 
-    class Meta(NameAndSlugBaseModel.Meta):
+    class Meta(NameAndSlug.Meta):
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
 
 
-class Genre(NameAndSlugBaseModel):
+class Genre(NameAndSlug):
     """Модель описывающая жанры."""
 
-    class Meta(NameAndSlugBaseModel.Meta):
+    class Meta(NameAndSlug.Meta):
         verbose_name = 'жанр'
         verbose_name_plural = 'Жанры'
 
@@ -101,10 +101,10 @@ class Title_Genre(models.Model):
     )
 
     def __str__(self):
-        return f"{self.genre} {self.title}"[:LENGTH_FOR_ADMIN]
+        return f'{self.genre} {self.title}'[:LENGTH_FOR_ADMIN]
 
 
-class AuthorTextPubDateBaseModel(models.Model):
+class AuthorTextPubDate(models.Model):
     """Абстрактный базовый класс для моделей Review и Comment."""
     author = models.ForeignKey(
         User,
@@ -126,17 +126,17 @@ class AuthorTextPubDateBaseModel(models.Model):
         return self.text[:LENGTH_FOR_ADMIN]
 
 
-class Review(AuthorTextPubDateBaseModel):
+class Review(AuthorTextPubDate):
     """Модель описывающая отзывы."""
     score = models.PositiveSmallIntegerField(
         validators=[
             MaxValueValidator(
                 MAX_CONST_SCORE_VALUE,
-                message='Введенная оценка больше 10, введите оценку (0-10)'
+                message='Введенная оценка больше 10, введите оценку (1-10)'
             ),
             MinValueValidator(
                 MIN_CONST_SCORE_VALUE,
-                message='Введенная оценка меньше 0, введите оценку (0-10)'
+                message='Введенная оценка меньше 1, введите оценку (1-10)'
             )
         ],
         verbose_name='Оценка(1-10)',
@@ -147,7 +147,7 @@ class Review(AuthorTextPubDateBaseModel):
         verbose_name='Произведение',
     )
 
-    class Meta(AuthorTextPubDateBaseModel.Meta):
+    class Meta(AuthorTextPubDate.Meta):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = (
@@ -159,7 +159,7 @@ class Review(AuthorTextPubDateBaseModel):
         default_related_name = 'reviews'
 
 
-class Comments(AuthorTextPubDateBaseModel):
+class Comments(AuthorTextPubDate):
     """Модель описывающая комментарии."""
     review = models.ForeignKey(
         Review,
@@ -167,7 +167,7 @@ class Comments(AuthorTextPubDateBaseModel):
         verbose_name='Отзыв',
     )
 
-    class Meta(AuthorTextPubDateBaseModel.Meta):
+    class Meta(AuthorTextPubDate.Meta):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         default_related_name = 'comment'

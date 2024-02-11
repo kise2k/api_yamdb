@@ -84,6 +84,10 @@ class ReviewsSerializers(serializers.ModelSerializer):
         read_only=True
     )
 
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        model = Review
+
     def validate(self, data):
         if not self.context.get('request').method == 'POST':
             return data
@@ -94,10 +98,6 @@ class ReviewsSerializers(serializers.ModelSerializer):
                 'Вы уже оставляли отзыв на это произведение'
             )
         return data
-
-    class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
-        model = Review
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -125,6 +125,10 @@ class SignUpSerializer(serializers.Serializer, UserValidateMixin):
         required=True
     )
 
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
     def create(self, validated_data):
         try:
             user, _ = User.objects.get_or_create(**validated_data)
@@ -132,10 +136,6 @@ class SignUpSerializer(serializers.Serializer, UserValidateMixin):
             raise serializers.ValidationError({'detail': str(e)})
         sending_confirmation_code(user)
         return user
-
-    class Meta:
-        model = User
-        fields = ('username', 'email')
 
 
 class TokenSerializer(serializers.Serializer, UserValidateMixin):

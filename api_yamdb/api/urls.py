@@ -7,9 +7,6 @@ from .views import (
     GenresViewSet,
     TitleViewSet,
     ReviewsViewSet,
-)
-
-from users.views import (
     UserViewSet,
     TokenView,
     SignUpView
