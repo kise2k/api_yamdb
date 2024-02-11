@@ -81,7 +81,6 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-
 class CategoryGenreViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
